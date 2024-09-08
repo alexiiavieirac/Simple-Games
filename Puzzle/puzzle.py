@@ -16,27 +16,35 @@ score = 0
 branco = (255, 255, 255)
 preto = (0, 0, 0)
 verde = (0, 255, 0)
+cinza = (192, 192, 192)
 
 # Criar a tela do jogo
 screen = pygame.display.set_mode((largura, altura))
 pygame.display.set_caption('Puzzle Deslizante')
 
+# Carregar imagens e fontes
+fundo_img = pygame.image.load("marmore.jpg")
+fonte_pontuacao = pygame.font.Font(None, 35)
+fonte_pecas = pygame.font.Font(None, 55)
+fonte_vitoria = pygame.font.Font(None, 65)
+fonte_score_final = pygame.font.Font(None, 35)
+fonte_botao = pygame.font.Font(None, 50)
+
 # Função para desenhar o tabuleiro do jogo
 def desenhar_tabuleiro(tabuleiro):
-    screen.fill(preto)
+    screen.blit(fundo_img, (0, 0))
 
     # Desenhar o score
-    fonte = pygame.font.Font(None, 35)
-    texto_score = fonte.render(f"Score: {score}", True, branco)
+    texto_score = fonte_pontuacao.render(f"Score: {score}", True, branco)
     screen.blit(texto_score, (10, 10))
 
     # Desenhar as peças do tabuleiro
     for i in range(linhas):
         for j in range(colunas):
             if tabuleiro[i][j] != 0:
-                pygame.draw.rect(screen, branco, (j * tamanho_peca + margem, i * tamanho_peca + margem, tamanho_peca - margem, tamanho_peca - margem))
-                fonte = pygame.font.Font(None, 55)
-                texto = fonte.render(str(tabuleiro[i][j]), True, preto)
+                pygame.draw.rect(screen, cinza, (j * tamanho_peca + margem, i * tamanho_peca + margem, tamanho_peca - margem, tamanho_peca - margem), border_radius=20)
+                pygame.draw.rect(screen, branco, (j * tamanho_peca + margem + 2, i * tamanho_peca + margem + 2, tamanho_peca - margem - 4, tamanho_peca - margem - 4), border_radius=20)
+                texto = fonte_pecas.render(str(tabuleiro[i][j]), True, preto)
                 screen.blit(texto, (j * tamanho_peca + tamanho_peca // 2 - texto.get_width() // 2, i * tamanho_peca + tamanho_peca // 2 - texto.get_width() // 2))
 
 
@@ -68,6 +76,7 @@ def mover_peca(tabuleiro, linha, coluna):
         return True
     return False
 
+
 # Função para verificar se o tabuleiro está organizado
 def verificar_vitoria(tabuleiro):
     esperado = [[(i * colunas + j + 1) % (colunas * linhas) for j in range(colunas)] for i in range(linhas)]
@@ -76,17 +85,15 @@ def verificar_vitoria(tabuleiro):
 
 # Função para exibir a tela de vitória
 def exibir_tela_vitoria(score):
-    screen.fill(preto)
-    fonte_grande = pygame.font.Font(None, 65)
-    fonte_pequena = pygame.font.Font(None, 35)
+    screen.blit(fundo_img, (0, 0))
 
     # Exibir a mensagem de vitória
-    texto_vitoria = fonte_grande.render("Você venceu!", True, verde)
-    screen.blit(texto_vitoria, (largura // 2 - texto_vitoria.get_width() // 2, altura // 2 - texto_vitoria.get_height() // 2))
+    texto_vitoria = fonte_vitoria.render("Você venceu!", True, verde)
+    screen.blit(texto_vitoria, (largura // 2 - texto_vitoria.get_width() // 2, altura // 2 - texto_vitoria.get_height() // 2 - 30))
 
     # Exibir o score final
-    texto_score_final = fonte_pequena.render(f"Score final: {score}", True, branco)
-    screen.blit(texto_score_final, (largura // 2 - texto_score_final.get_width() // 2, altura // 2 - texto_score_final.get_height() // 2))
+    texto_score_final = fonte_score_final.render(f"Score final: {score}", True, branco)
+    screen.blit(texto_score_final, (largura // 2 - texto_score_final.get_width() // 2, altura // 2 - texto_score_final.get_height() // 2 + 30))
 
     pygame.display.flip()
 
@@ -117,8 +124,6 @@ while rodando:
         # Verifica se o jogador ganhou
         if verificar_vitoria(tabuleiro):
             vitoria = True
-
-    desenhar_tabuleiro(tabuleiro)
 
     # Exibir mensagem de vitória
     if vitoria:
